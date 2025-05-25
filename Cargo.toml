@@ -1,12 +1,12 @@
 [package]
 name = "macroquad"
 version = "0.4.14"
-authors = ["not-fl3 <not.fl3@gmail.com>"]
+authors = ["Jacopo Faust Buttiglieri <jacopo.buttiglieri@gmail.com>","not-fl3 <not.fl3@gmail.com>"]
 edition = "2021"
-homepage = "https://github.com/not-fl3/macroquad"
-repository = "https://github.com/not-fl3/macroquad"
+homepage = "https://github.com/FireBellyToad/visceraquad"
+repository = "https://github.com/FireBellyToad/visceraquad"
 description = """
-Simple and easy to use graphics library
+Simple and easy to use graphics library used by World's Viscera. Fork of "not-fl3/macroquad"
 """
 readme="README.md"
 license = "MIT OR Apache-2.0"

@@ -191,6 +191,7 @@ struct Context {
     touches: HashMap<u64, input::Touch>,
     chars_pressed_queue: Vec<char>,
     chars_pressed_ui_queue: Vec<char>,
+    keys_pressed_queue: Vec<KeyCode>,
     mouse_position: Vec2,
     last_mouse_position: Option<Vec2>,
     mouse_wheel: Vec2,
@@ -325,6 +326,7 @@ impl Context {
             keys_down: HashSet::new(),
             keys_pressed: HashSet::new(),
             keys_released: HashSet::new(),
+            keys_pressed_queue: Vec::new(),
             chars_pressed_queue: Vec::new(),
             chars_pressed_ui_queue: Vec::new(),
             mouse_down: HashSet::new(),
@@ -666,6 +668,7 @@ impl EventHandler for Stage {
     fn key_down_event(&mut self, keycode: KeyCode, modifiers: KeyMods, repeat: bool) {
         let context = get_context();
         context.keys_down.insert(keycode);
+        context.keys_pressed_queue.push(keycode);
         if repeat == false {
             context.keys_pressed.insert(keycode);
         }
