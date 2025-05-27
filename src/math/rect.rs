@@ -25,6 +25,10 @@ impl Rect {
         Rect { x, y, w, h }
     }
 
+    pub const fn new_from_i32(x: i32, y: i32, w: i32, h: i32) -> Rect {
+        Rect { x: x as f32, y: y as f32, w: w as f32, h: h as f32}
+    }
+
     /// Returns the top-left corner of the `Rect`.
     pub const fn point(&self) -> Vec2 {
         vec2(self.x, self.y)
@@ -38,6 +42,11 @@ impl Rect {
     /// Returns the center position of the `Rect`.
     pub const fn center(&self) -> Vec2 {
         vec2(self.x + self.w * 0.5f32, self.y + self.h * 0.5f32)
+    }
+
+    /// Returns the center position of the `Rect`.
+    pub const fn center_to_i32_tuple(&self) -> (i32,i32) {
+        ((self.x + self.w * 0.5f32) as i32, (self.y + self.h * 0.5f32) as i32)
     }
 
     /// Returns the left edge of the `Rect`.
