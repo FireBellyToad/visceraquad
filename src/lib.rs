@@ -146,6 +146,7 @@ pub mod logging {
 pub use ::log as logging;
 pub use miniquad;
 
+use crate::input::clear_input_queue;
 use crate::{
     color::{colors::*, Color},
     quad_gl::QuadGl,
@@ -694,6 +695,7 @@ impl EventHandler for Stage {
         let context = get_context();
         context.keys_down.remove(&keycode);
         context.keys_released.insert(keycode);
+        clear_input_queue();
 
         context
             .input_events
