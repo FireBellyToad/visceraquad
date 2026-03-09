@@ -121,13 +121,29 @@ impl Camera2D {
     /// Returns the screen space position for a 2d camera world space position.
     ///
     /// Screen position in window space - from (0, 0) to (screen_width, screen_height()).
+    /// When a viewport is set, returns coordinates within that viewport's screen region.
     pub fn world_to_screen(&self, point: Vec2) -> Vec2 {
+        let dims = self
+            .viewport()
+            .map(|(vx, vy, vw, vh)| Rect {
+                x: vx as f32,
+                y: screen_height() - (vy + vh) as f32,
+                w: vw as f32,
+                h: vh as f32,
+            })
+            .unwrap_or(Rect {
+                x: 0.0,
+                y: 0.0,
+                w: screen_width(),
+                h: screen_height(),
+            });
+
         let mat = self.matrix();
         let transform = mat.transform_point3(vec3(point.x, point.y, 0.));
 
         vec2(
-            (transform.x / 2. + 0.5) * screen_width(),
-            (0.5 - transform.y / 2.) * screen_height(),
+            (transform.x / 2. + 0.5) * dims.w + dims.x,
+            (0.5 - transform.y / 2.) * dims.h + dims.y,
         )
     }
 
@@ -224,7 +240,12 @@ impl Default for Camera3D {
 
 impl Camera for Camera3D {
     fn matrix(&self) -> Mat4 {
-        let aspect = self.aspect.unwrap_or(screen_width() / screen_height());
+        let (width, height) = if let Some(rt) = &self.render_target {
+            (rt.texture.width(), rt.texture.height())
+        } else {
+            (screen_width(), screen_height())
+        };
+        let aspect = self.aspect.unwrap_or(width / height);
 
         match self.projection {
             Projection::Perspective => {
