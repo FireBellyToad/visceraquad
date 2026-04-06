@@ -1,6 +1,6 @@
 //! Functions to load fonts and draw text.
 
-use std::collections::HashMap;
+use std::{cmp::max, collections::HashMap};
 
 use crate::{
     color::Color,
@@ -256,6 +256,7 @@ pub struct TextParams<'a> {
     /// Default is 0.0
     pub rotation: f32,
     pub color: Color,
+    pub alignment: TextAlignment,
 }
 
 impl<'a> Default for TextParams<'a> {
@@ -267,6 +268,7 @@ impl<'a> Default for TextParams<'a> {
             font_scale_aspect: 1.0,
             color: WHITE,
             rotation: 0.0,
+            alignment: TextAlignment::Left,
         }
     }
 }
@@ -451,11 +453,28 @@ pub fn draw_multiline_text_ex(
         }
     };
 
+    let text_ref = text.as_ref();
+    let max_line = text_ref.lines().reduce(|a, b| max(a, b)).unwrap_or("");
+    let max_line_width =
+        measure_text(max_line, params.font, params.font_size, params.font_scale).width;
+
     let mut dimensions = TextDimensions::default();
     let y_step = line_distance * params.font_size as f32 * params.font_scale;
 
-    for line in text.as_ref().lines() {
-        let line_dimensions = draw_text_ex(line, x, y, params.clone());
+    for line in text_ref.lines() {
+        let x_step = match params.alignment {
+            TextAlignment::Left => 0.0,
+            TextAlignment::Center => {
+                (max_line_width
+                    - measure_text(line, params.font, params.font_size, params.font_scale).width)
+                    / 2.0
+            }
+            TextAlignment::Right => {
+                max_line_width
+                    - measure_text(line, params.font, params.font_size, params.font_scale).width
+            }
+        };
+        let line_dimensions = draw_text_ex(line, x + x_step, y, params.clone());
         x -= (line_distance * params.font_size as f32 * params.font_scale) * params.rotation.sin();
         y += (line_distance * params.font_size as f32 * params.font_scale) * params.rotation.cos();
 
@@ -641,4 +660,14 @@ pub fn camera_font_scale(world_font_size: f32) -> (u16, f32, f32) {
     let font_size = screen_font_size as u16;
 
     (font_size, cam_h / scr_h, scr_h / scr_w * cam_w / cam_h)
+}
+
+/// Text alignment options for [`TextParams`].
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum TextAlignment {
+    #[default]
+    Left,
+    Center,
+    Right,
 }
